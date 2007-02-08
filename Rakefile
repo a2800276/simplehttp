@@ -98,7 +98,7 @@ RubyForgeUser="a2800276"
 RubyForgeProject=PROJECT_NAME
 
 desc "Upload the web pages to the web."
-task :upload_pages => ["rdoc", "clean"] do
+task :upload_pages => ["clean", :rdoc] do
   if RubyForgeProject then
     path = "/var/www/gforge-projects/#{RubyForgeProject}"
     sh "scp -r doc/html/* #{RubyForgeUser}@rubyforge.org:#{path}"
