@@ -1,9 +1,29 @@
-SimpleHttp - a simplified wrapper around Net::Http
+= SimpleHttp - a simplified wrapper around Net::Http
 
 SimpleHttp aims to reduce the complexity of Net::Http while providing
 the most commonly used (by me) http functionality. 
 
+INSTALLATION
+
+* Using +gem+
+
+	gem install simple_http
+
+* Using +setup.rb+
+
+	ruby setup.rb config
+	ruby setup.rb install
+
+* tarball and zip packages are available from
+  RubyForge[http://rubyforge.org/projects/simplehttp/]
+
+
+
 FEATURES / USAGE
+
+* Require the lib: 
+	
+	require 'simple_http'
 
 * No fuss one line GET and POST requests:
 	
@@ -40,7 +60,9 @@ FEATURES / USAGE
 
 * Access headers of the request or response
 	http = SimpleHttp.new "www.example.com"
-	http.request_header["X-Custom-Header"]="useful header"	
+	http.request_headers["X-Custom-Header"]="useful header"	
+	http.get
+	puts "server set cookie: #{http.response_headers['set-cookie']}"
 	
 * Automatically follows Http Redirects.
 	

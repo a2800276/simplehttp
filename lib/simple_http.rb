@@ -42,15 +42,21 @@ require 'base64'
 #		sh.get
 class SimpleHttp
 	
-	VERSION='0.1.0'
+	VERSION='0.1.1'
 
-	attr_accessor :proxy_host, :proxy_port, :proxy_user, :proxy_pwd, :uri, :request_headers, :response_handlers, :follow_num_redirects
+	attr_accessor :proxy_host, :proxy_port, :proxy_user, :proxy_pwd, :uri, :request_headers, :response_headers, :response_handlers, :follow_num_redirects
 
 	RESPONSE_HANDLERS = {
 		Net::HTTPResponse => lambda { |request, response, http| 
+			response.each_header {|key, value|
+				http.response_headers[key]=value	
+			}
 			raise response.to_s
 		},
 		Net::HTTPSuccess => lambda { |request, response, http|
+			response.each_header {|key, value|
+				http.response_headers[key]=value	
+			}
 			return response.body
 		},
 		Net::HTTPRedirection => lambda { |request, response, http|
@@ -65,6 +71,10 @@ class SimpleHttp
 			# copy the response handlers used in the current
 			# request in case they were non standard.
 			sh.response_handlers = http.response_handlers
+
+			# copy the request headers
+			sh.request_headers=http.request_headers
+			sh.response_headers=http.response_headers
 
 			# http doesn't permit redirects for methods
 			# other than GET of HEAD, so we complain in case
@@ -110,6 +120,7 @@ class SimpleHttp
 
 
 		@request_headers={}
+		@response_headers={}
 		@response_handlers=RESPONSE_HANDLERS.clone
 		@follow_num_redirects=3
 

@@ -48,6 +48,7 @@ class SimpleHttpTest < Test::Unit::TestCase
 		ret = SimpleHttp.get uri, "query" => "query_test"
 		assert_equal("query_test", ret, "basic GET (query) 4.1 test failed.");
 
+
 	end
 
 	# Tests for http GET calls implemented using instantiated SimpleHttp objects.
@@ -69,13 +70,26 @@ class SimpleHttpTest < Test::Unit::TestCase
 		ret = http.get "query2" => "query_test"
 		assert_equal("query_test", ret, "basic GET (query) 3 test failed.")
 
-		# GET requst with a custom request_header
+		# GET request with a custom request_header
 		http = SimpleHttp.new "http://127.0.0.1:12345/header_test"
 		http.request_headers= {'x-special-http-header'=>'my-value'}
 		ret = http.get
 		assert_equal("my-value", ret, "GET header test 4")
 
+		# GET test with custom response_headers
+		http = SimpleHttp.new "http://127.0.0.1:12345/header_test"
+		http.request_headers= {'x-special-http-header'=>'resp-header-test'}
+		http.get
+		assert_equal("resp-header-test", http.response_headers['x-special-response'], "GET response header test 5")
 
+		# GET test with custom request & response header and redirect
+		# test that request headers we set remain intact during redirects.
+
+		http = SimpleHttp.new "http://127.0.0.1:12345/redirect_special_header"
+		http.request_headers["x-special-http-header"]='redirect_test'
+		http.get
+		assert_equal("redirect_test", http.response_headers['x-special-response'], "GET response header redirect test. 6")
+				
 	end
 	
 	# http POST calls using class methods.

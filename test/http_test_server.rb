@@ -52,6 +52,7 @@ class TestServer
 		# return value of request header named "X-Special-Http-Header"
 		@server.mount_proc("/header_test"){|req, res|
 			res.body=req.header["x-special-http-header"][0]
+			res['x-special-response']=req.header["x-special-http-header"][0]
 		}
 		
 		# return value of request header named "X-Special-Http-Header"
@@ -85,6 +86,11 @@ class TestServer
 		@server.mount_proc("/redirect") { |req, res|
 			res.status=301
 			res.header['location']="http://127.0.0.1:12345/test1"	
+		}
+
+		@server.mount_proc("/redirect_special_header") { |req, res|
+			res.status=301
+			res.header['location']="http://127.0.0.1:12345/header_test"
 		}
 	end
 end

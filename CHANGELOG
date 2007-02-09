@@ -1,0 +1,5 @@
+= Fri Feb  9 12:23:20 CET 2007
+*	easier access to response headers
+*	pass through headers during redirects
+*	more tests and documentation
+*	included `setup.rb`
