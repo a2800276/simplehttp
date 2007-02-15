@@ -22,6 +22,8 @@ def handle_url url
 end
 
 pch = Proc.new { |req, res|
+
+
 	if res['content-type']=~/^text\/html/
 		
 		case res['content-encoding']
@@ -57,17 +59,29 @@ pch = Proc.new { |req, res|
 		puts res['content-type']
 	end
 
-		puts "!***! status #{res.status}"
 	if res.status.to_i == 302
 		if location = handle_url(res['location'])
 			res['location']=[location]
 		end
 
-		res.each {|key,value|
-			puts "<- #{key} : #{value}"
-		}
 		
 	end
+	
+	puts "------------------------------------------------------------------------"
+	puts "-----------------#{req.request_uri}-------------------------------------"
+	req.each {|key,value|
+		puts "-> #{key} : #{value}"
+	}
+	res.each {|key,value|
+		puts "<- #{key} : #{value}"
+	}
+
+	puts "- #{res['set-cookie']} -"
+	puts "== #{res.cookies.class} =="
+	res.cookies.each { |cookie| 
+		cookie.gsub! /; secure/, ''
+	}
+	puts "------------------------------------------------------------------------"
 }
 
 rewrite = Proc.new {|req|
@@ -86,9 +100,9 @@ rewrite = Proc.new {|req|
 
 		#req['host'] = orig.host
 		puts req.request_uri.to_s
-		req.each {|key, value|
-			puts "-> #{key} : #{value}"
-		}
+		#req.each {|key, value|
+		#	puts "-> #{key} : #{value}"
+		#}
 
 
 	end
