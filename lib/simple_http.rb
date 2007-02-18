@@ -45,27 +45,40 @@ class SimpleHttp
 	VERSION='0.1.1'
 
 	attr_accessor :proxy_host, :proxy_port, :proxy_user, :proxy_pwd, :uri, :request_headers, :response_headers, :response_handlers, :follow_num_redirects
-
 	RESPONSE_HANDLERS = {
 		Net::HTTPResponse => lambda { |request, response, http| 
 			response.each_header {|key, value|
 				http.response_headers[key]=value	
 			}
-			raise response.to_s
+			STDERR.puts http.uri
+			raise "#{response.to_s} : #{response.value} : #{http.uri}"
 		},
 		Net::HTTPSuccess => lambda { |request, response, http|
 			response.each_header {|key, value|
 				http.response_headers[key]=value	
 			}
+			#http.cookies += response.cookies
+
 			return response.body
 		},
-		Net::HTTPRedirection => lambda { |request, response, http|
+		Net::HTTPRedirection =>  lambda { |request, response, http|
 			raise "too many redirects!" unless http.follow_num_redirects > 0	
-			
 			# create a new SimpleHttp for the location
 			# refered to decreasing the remaining redirects
 			# by one.
-			sh = SimpleHttp.new response['location']
+			
+			if (location = response['location']) !~ /^https?:\/\//
+				new_location = "#{http.uri.scheme}://#{http.uri.host}"
+				if location =~ /^\//
+					new_location += location
+				else
+					new_location += "/#{http.uri.path}/#{location}"
+				end
+				location = new_location	
+			end
+
+			sh = SimpleHttp.new location 
+			STDERR.puts location	
 			sh.follow_num_redirects = http.follow_num_redirects-1
 
 			# copy the response handlers used in the current
@@ -75,6 +88,7 @@ class SimpleHttp
 			# copy the request headers
 			sh.request_headers=http.request_headers
 			sh.response_headers=http.response_headers
+			#sh.cookies+=http.cookies
 
 			# http doesn't permit redirects for methods
 			# other than GET of HEAD, so we complain in case
@@ -84,7 +98,9 @@ class SimpleHttp
 			if request.class == Net::HTTP::Get
 				return sh.get
 			else 
-				raise "Not a valid HTTP method for redirection: #{request.class}"
+				STDERR.puts "Not a valid HTTP method for redirection: #{request.class}"
+				sh.request_headers['content-length']=nil
+				return sh.get
 				
 			end
 		}
@@ -121,6 +137,7 @@ class SimpleHttp
 
 		@request_headers={}
 		@response_headers={}
+		@cookies=[]
 		@response_handlers=RESPONSE_HANDLERS.clone
 		@follow_num_redirects=3
 
@@ -255,6 +272,8 @@ class SimpleHttp
 			# the response_handlers hash contains a handler
 			# for the specific response class.
 			if @response_handlers[c]
+			STDERR.puts "!#{http_response.class}"
+			STDERR.puts "!#{@response_handlers[c]}"
 				return @response_handlers[c].call(http_request, http_response, self)
 			end
 

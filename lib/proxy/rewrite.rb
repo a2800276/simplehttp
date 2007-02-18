@@ -1,6 +1,8 @@
 require "webrick"
 require "webrick/httpproxy"
 
+require 'uri'
+
 
 
 module WEBrick
@@ -11,11 +13,16 @@ module WEBrick
 	# configuration symbol +:RequestRewriteProc+ which
 	# take a block that is passed the request before it is sent.
 	class RewritingProxy < HTTPProxyServer
+		PORT = 10080
 
 		# :RequestRewriteProc
 		def initialize (config)
+			config[:ProxyURI] ||= upstream_proxy
+			config[:Port] ||= PORT
 			super
+			Signal.trap(:INT){ self.shutdown }
 		end
+
 
 		def service(req, res)
 			#p req
@@ -25,6 +32,16 @@ module WEBrick
 			
 			super
 	
+		end
+
+		
+		private
+
+		def upstream_proxy
+			if proxy = ENV['http_proxy']
+				return URI.parse(proxy)
+			end
+			return nil
 		end
 	end # RewritingProxy
 
@@ -45,7 +62,6 @@ module WEBrick
 			# end
 			#
 			@header['host']=[@host]
-			puts "!!!!!!!! #{@request_uri}"
 		end
 
 	end
