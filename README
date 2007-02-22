@@ -7,7 +7,7 @@ INSTALLATION
 
 * Using +gem+
 
-	gem install simple_http
+	gem install simplehttp
 
 * Using +setup.rb+
 
