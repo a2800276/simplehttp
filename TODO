@@ -1,3 +1,5 @@
+* Provide tests and documentation for +head+, +options+ and +trace+
+
 * There seems to be a bug in webrick that it doesn't recognize the
   Content-Length header if using basic authentication. The POST test
   cases lead to a:

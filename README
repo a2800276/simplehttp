@@ -23,7 +23,7 @@ FEATURES / USAGE
 
 * Require the lib: 
 	
-	require 'simple_http'
+	require 'simplehttp'
 
 * No fuss one line GET and POST requests:
 	

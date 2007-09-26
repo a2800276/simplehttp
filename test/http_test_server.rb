@@ -1,5 +1,5 @@
 require 'webrick'
-require 'constants'
+#require 'constants'
 
 include WEBrick
 class TestServer
