@@ -70,6 +70,10 @@ class SimpleHttpTest < Test::Unit::TestCase
 		ret = http.get "query2" => "query_test"
 		assert_equal("query_test", ret, "basic GET (query) 3 test failed.")
 
+		http = SimpleHttp.new(URI.parse("http://127.0.0.1:12345/query_test2?bla=true"))
+		ret = http.get "something"=>"or the other", "query2" => "query_test"
+		assert_equal("query_test", ret, "basic GET (query) 4 test failed.")
+
 		# GET request with a custom request_header
 		http = SimpleHttp.new "http://127.0.0.1:12345/header_test"
 		http.request_headers= {'x-special-http-header'=>'my-value'}
@@ -196,11 +200,11 @@ class SimpleHttpTest < Test::Unit::TestCase
 			ret = http.get
 		}
 		
+			
 		ret = SimpleHttp.get "http://test:pwd@127.0.0.1:12345/redirect"
 		assert_equal(ret, TestServer::SUCCESS_TEXT_0, "redirect test 2");
-		
-
 	end
+	
 
 
 end

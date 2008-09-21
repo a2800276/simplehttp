@@ -95,23 +95,34 @@ class SimpleHttp
 			sh.response_headers=http.response_headers
 			#sh.cookies+=http.cookies
 
-			# http doesn't permit redirects for methods
-			# other than GET of HEAD, so we complain in case
-			# we get them in response to a POST request. (Or
-			# anything other than GET, for that matter.) 
-			
-			if request.class == Net::HTTP::Get
-				return sh.get
-			elsif request.class == Net::HTTP::Head
-				return sh.head
-			elsif request.class == Net::HTTP::Options
-				return sh.options
-			else 
-				#STDERR.puts "Not a valid HTTP method for redirection: #{request.class}"
-				sh.request_headers['content-length']=nil
-				return sh.get
+			# copy host and port
+			sh.uri.host = http.uri.host
+			sh.uri.port = http.uri.port
+
+			# HTTP doesn't permit redirects for methods other than
+			# GET or HEAD. The exception is 303 redirects, which
+			# should automatically follow the redirect URI using a
+			# GET method regardless of the initial method. For
+			# other classes of redirection, the client is required
+			# to prompt the user before redirection occurs. Because
+			# that's not a feasible action for this library, all
+			# 3xx redirect URIs are followed using a GET method. 
+			#
+			# http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+
+			case request
+			when 	Net::HTTP::Get, 
+				Net::HTTP::Head,
+				Net::HTTP::Options
 				
+				sh.get
+			when Net::HTTP::Post
+				sh.request_headers['content-length']=nil
+				sh.get
+ 			else 
+ 				raise "Not a valid HTTP method for redirection: #{request.class}"
 			end
+
 		}
 
 	}
@@ -315,11 +326,9 @@ class SimpleHttp
 	# internal
 	def make_query query
 		return query unless query && query.class == Hash
-		str = ""
-		query.collect { |key, value|
-			str += CGI::escape(key) + "=" + CGI::escape(value)
-		}
-		str
+		query.inject([]) do |s, (key, value)|
+			s << CGI::escape(key) + "=" + CGI::escape(value)
+		end.join('&')
 	end
 	
 	# Make a simple GET request to the provided URI.
