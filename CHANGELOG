@@ -1,3 +1,7 @@
+= Sun Sep 21 18:29:20 CEST 2008
+* 	changes to redirect handling
+*	bugfix make_query
+
 = Wed Sep 26 16:25:55     2007
 	implemented +head+, +options+ and +trace+,
 	made filenames easier. 'simple_http' -> 'simplehttp'

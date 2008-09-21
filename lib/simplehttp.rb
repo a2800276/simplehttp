@@ -46,7 +46,7 @@ require 'base64'
 #		sh.get
 class SimpleHttp
 	
-	VERSION='0.1.2'
+	VERSION='0.1.3'
 
 	attr_accessor :proxy_host, :proxy_port, :proxy_user, :proxy_pwd, :uri, :request_headers, :response_headers, :response_handlers, :follow_num_redirects
 	RESPONSE_HANDLERS = {
