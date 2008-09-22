@@ -1,3 +1,6 @@
+= Mon Sep 22 13:25:22 CEST 2008
+*	bugfix: uri query parameter preserved on post req	
+
 = Sun Sep 21 18:29:20 CEST 2008
 * 	changes to redirect handling
 *	bugfix make_query
