@@ -1,3 +1,7 @@
+= Mon Sep 22 15:12:44 CEST 2008
+* 	General code cleanup
+*	Additional Docs
+*	Reluctantly changes tabs to (ruby default) spaces (YUCK!)
 = Mon Sep 22 13:25:22 CEST 2008
 *	bugfix: uri query parameter preserved on post req	
 
