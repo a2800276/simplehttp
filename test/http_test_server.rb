@@ -66,6 +66,11 @@ class TestServer
 			end	
 		}
 
+    # Test that query in uri gets transmitted in post reqs as well.
+    @server.mount_proc("/post_test_uri_query") { |req, res|
+      res.body = req.query_string
+    }
+
 		@server.mount_proc("/basic_auth") {|req, res|
 			
 			auth = Base64.decode64(req.header['authorization'][0].split[1])

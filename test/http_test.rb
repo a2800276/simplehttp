@@ -139,6 +139,10 @@ class SimpleHttpTest < Test::Unit::TestCase
 		ret = http.post "query2" => "query_test"
 		assert_equal("query_test", ret, "basic POST (query) 3 test failed.")
 
+		http = SimpleHttp.new "http://127.0.0.1:12345/post_test_uri_query?query=query_test"
+		ret = http.post "query2"=>"query2_test"
+		assert_equal("query=query_test", ret, "instance POST 3.1 test (query on url for post query.)")
+
 		# POST requst with a custom request_header
 		http = SimpleHttp.new "http://127.0.0.1:12345/header_test"
 		http.request_headers= {'x-special-http-header'=>'my-value'}

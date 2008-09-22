@@ -424,7 +424,9 @@ class SimpleHttp
 	#	is set.
 	#
 	def post query=nil, content_type='application/x-www-form-urlencoded'
-		req = Net::HTTP::Post.new(@uri.path)
+		path =  @uri.query ? "#{@uri.path}?#{@uri.query}" : @uri.path 
+		req = Net::HTTP::Post.new(path)
+
 
 		req.body= make_query query if query
 		req.content_type=content_type if query
