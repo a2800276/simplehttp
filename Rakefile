@@ -4,7 +4,7 @@ require "rake/testtask"
 require "rake/clean"
 require "rubygems"
 
-require "lib/simple_http"
+load "lib/simplehttp.rb"
 
 # Specifies the default task to execute. This is often the "test" task
 # and we'll change things around as soon as we have some tests.
