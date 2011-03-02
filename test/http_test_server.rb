@@ -32,6 +32,10 @@ class TestServer
     @server.shutdown
   end
 
+  def status
+    @server.status
+  end
+
   def dbg str 
     puts "!!!!!!!!! #{str}"
   end

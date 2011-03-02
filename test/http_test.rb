@@ -1,4 +1,4 @@
-require 'simple_http.rb'
+require 'simplehttp.rb'
 require 'http_test_server.rb'
 
 require 'test/unit'
@@ -11,16 +11,25 @@ require 'base64'
 class SimpleHttpTest < Test::Unit::TestCase
   def initialize *args
     super *args
+  end
+
+  def setup
     # create webbrick server in a separate thread
-    Thread.new {
-      TestServer.new.start
+    @server = TestServer.new
+    t = Thread.new {
+      @server.start
     }
+    while @server.status != :Running
+      Thread.pass
+      unless t.alive?
+        t.join
+        raise
+      end
+    end
   end
 
   def teardown
-    #@t.shutdown # webrick blocks in a weird way, can't
-    #commnicate with it in a different thread. this, of
-    #course, is really ugly.
+    @server.shutdown
   end
 
   # Tests of SimpleHttp class method behaviour.
