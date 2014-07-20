@@ -1,26 +1,30 @@
-require 'simple_http.rb'
+require 'simplehttp.rb'
 require 'http_test_server.rb'
 
 require 'test/unit'
 require 'uri'
 require 'base64'
+require 'webrick/httpproxy'
 
 # These tests communicate with a corresponding http server (TestServer), which is
 # implemented in `http_test_server.rb`
 
 class SimpleHttpTest < Test::Unit::TestCase
+  ProxyPort = 12346
+
   def initialize *args
     super *args
+  end
+
+  def setup
     # create webbrick server in a separate thread
-    Thread.new {
-      TestServer.new.start
-    }
+    @server = TestServer.new
+    start_server_thread(@server)
   end
 
   def teardown
-    #@t.shutdown # webrick blocks in a weird way, can't
-    #commnicate with it in a different thread. this, of
-    #course, is really ugly.
+    @server.shutdown
+    teardown_proxyserver if @proxyserver
   end
 
   # Tests of SimpleHttp class method behaviour.
@@ -208,7 +212,41 @@ class SimpleHttpTest < Test::Unit::TestCase
     assert_equal(ret, TestServer::SUCCESS_TEXT_0, "redirect test 2");
   end
 
+  def test_proxy_server
+    setup_proxyserver
+    http = SimpleHttp.new "http://test:pwd@127.0.0.1:12345/basic_auth"
+    http.set_proxy('127.0.0.1', ProxyPort)
+    ret = http.get
+    assert_equal(TestServer::SUCCESS_TEXT_1, ret, "basic auth get class 1 test failed.");
+  end
 
+  def setup_proxyserver
+    @proxyserver = WEBrick::HTTPProxyServer.new(
+      :BindAddress => "127.0.0.1",
+      :Port => ProxyPort,
+      :AccessLog => []
+    )
+    start_server_thread(@proxyserver)
+  end
+
+  def teardown_proxyserver
+    @proxyserver.shutdown
+  end
+
+  def start_server_thread(server)
+    t = Thread.new {
+      Thread.current.abort_on_exception = true
+      server.start
+    }
+    while server.status != :Running
+      Thread.pass
+      unless t.alive?
+        t.join
+        raise
+      end
+    end
+    t
+  end
 
 end
 

@@ -276,7 +276,7 @@ class SimpleHttp
       if !port && !user && !pwd
         proxy = URI.parse(proxy)
       else 
-        @proxy_host= host
+        @proxy_host= proxy
         @proxy_port= port
         @proxy_user= user
         @proxy_pwd = pwd
